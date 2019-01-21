@@ -25,8 +25,6 @@ describe('index', () => {
 					assert.deepEqual(result, expected)
 				})
 			})
-			
 		})
-
 	})
 })

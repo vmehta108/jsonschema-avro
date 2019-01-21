@@ -36,5 +36,8 @@
   },
   "peerDependencies": {
     "json-schema-ref-parser": "6.x"
+  },
+  "dependencies": {
+    "json-schema-ref-parser": "^6.0.3"
   }
 }

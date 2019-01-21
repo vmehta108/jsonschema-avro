@@ -1,5 +1,3 @@
-const jsonSchemaAvro = module.exports = {}
-
 let $RefParser;
 try {
 	$RefParser = require('json-schema-ref-parser');
@@ -7,6 +5,8 @@ try {
 catch(e) { 
 	$RefParser = null;
 }
+
+const jsonSchemaAvro = module.exports = {}
 
 // Json schema on the left, avro on the right
 const typeMapping = {
@@ -37,13 +37,20 @@ jsonSchemaAvro.convert = async (schema) => {
 }
 
 jsonSchemaAvro._mainRecord = (jsonSchema) => {
-	return {
-		namespace: jsonSchemaAvro._convertId(jsonSchema.id),
-		name: 'main',
-		type: 'record',
-		doc: jsonSchema.description,
-		fields: jsonSchema.properties ? jsonSchemaAvro._convertProperties(jsonSchema.properties) : []
-	}
+	return jsonSchemaAvro._isOneOf(jsonSchema) || jsonSchemaAvro._isAnyOf(jsonSchema) ? 
+		{
+			namespace: jsonSchemaAvro._convertId(jsonSchema.id),
+			...jsonSchemaAvro._convertCombinationOfProperty('main', jsonSchema)
+		}:
+		{
+			namespace: jsonSchemaAvro._convertId(jsonSchema.id),
+			name: 'main',
+			type: 'record',
+			doc: jsonSchema.description,
+			fields: [].concat.apply([], jsonSchemaAvro._getCombinationOf(jsonSchema).
+				map((it) => it.properties ? jsonSchemaAvro._convertProperties(it.properties) : [])
+			)
+		}
 }
 
 jsonSchemaAvro._convertId = (id) => {
