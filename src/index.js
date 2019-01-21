@@ -1,10 +1,4 @@
-let $RefParser;
-try {
-	$RefParser = require('json-schema-ref-parser');
-}
-catch(e) { 
-	$RefParser = null;
-}
+const	$RefParser = require('json-schema-ref-parser');
 
 const jsonSchemaAvro = module.exports = {}
 
@@ -24,15 +18,13 @@ jsonSchemaAvro.convert = async (schema) => {
 	if(!schema){
 		throw new Error('No schema given')
 	}
-	const avroSchema = $RefParser ?
-		await $RefParser.dereference(schema)
+	const avroSchema = await $RefParser.dereference(schema)
 		  .then(function(jsonSchema) {
 		    return jsonSchemaAvro._mainRecord(jsonSchema)
 		  })
 		  .catch(function(err) {
 		  	throw err;
-		  }) :
-		await Promise.resolve(jsonSchemaAvro._mainRecord(schema));
+		  });
 	return avroSchema
 }
 
