@@ -1,5 +1,8 @@
 # jsonschema-avro
 
+Parent Project: 
+[thedumbterminal/jsonschema-avro](https://github.com/thedumbterminal/jsonschema-avro)
+
 [![npm](https://img.shields.io/npm/v/jsonschema-avro.svg)](https://www.npmjs.com/package/jsonschema-avro)
 [![Build Status](https://travis-ci.org/thedumbterminal/jsonschema-avro.svg?branch=master)](https://travis-ci.org/thedumbterminal/jsonschema-avro)
 
@@ -29,7 +32,7 @@ Converts JSON-schema definitions into Avro definitions.
     
     const avro = jsonSchemaAvro.convert(inJson)
 
-Please ensure that the input JSON schema is dereferenced so that all external references have been resolved. [json-schema-ref-parser](https://www.npmjs.com/package/json-schema-ref-parser) can do this, prior to using this module.
+All external references are resolved using the excellent [json-schema-ref-parser](https://www.npmjs.com/package/json-schema-ref-parser).
 
 ## Test
 
@@ -37,4 +40,4 @@ Please ensure that the input JSON schema is dereferenced so that all external re
 
 ## TODO
 
-* Handle `anyOf` and `allOf`.
+* More tests for edge cases.
