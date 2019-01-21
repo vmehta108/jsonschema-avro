@@ -1,5 +1,13 @@
 const jsonSchemaAvro = module.exports = {}
 
+let $RefParser;
+try {
+	$RefParser = require('json-schema-ref-parser');
+}
+catch(e) { 
+	$RefParser = null;
+}
+
 // Json schema on the left, avro on the right
 const typeMapping = {
 	'array': 'array',
@@ -12,28 +20,30 @@ const typeMapping = {
 
 const reSymbol = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
-jsonSchemaAvro.convert = (schema) => {
+jsonSchemaAvro.convert = async (schema) => {
 	if(!schema){
 		throw new Error('No schema given')
 	}
-	return jsonSchemaAvro._mainRecord(schema)
+	const avroSchema = $RefParser ?
+		await $RefParser.dereference(schema)
+		  .then(function(jsonSchema) {
+		    return jsonSchemaAvro._mainRecord(jsonSchema)
+		  })
+		  .catch(function(err) {
+		  	throw err;
+		  }) :
+		await Promise.resolve(jsonSchemaAvro._mainRecord(schema));
+	return avroSchema
 }
 
 jsonSchemaAvro._mainRecord = (jsonSchema) => {
-	return jsonSchemaAvro._isOneOf(jsonSchema) || jsonSchemaAvro._isAnyOf(jsonSchema) ? 
-		{
-			namespace: jsonSchemaAvro._convertId(jsonSchema.id),
-			...jsonSchemaAvro._convertCombinationOfProperty('main', jsonSchema)
-		}:
-		{
-			namespace: jsonSchemaAvro._convertId(jsonSchema.id),
-			name: 'main',
-			type: 'record',
-			doc: jsonSchema.description,
-			fields: [].concat.apply([], jsonSchemaAvro._getCombinationOf(jsonSchema).
-				map((it) => it.properties ? jsonSchemaAvro._convertProperties(it.properties) : [])
-			)
-		}
+	return {
+		namespace: jsonSchemaAvro._convertId(jsonSchema.id),
+		name: 'main',
+		type: 'record',
+		doc: jsonSchema.description,
+		fields: jsonSchema.properties ? jsonSchemaAvro._convertProperties(jsonSchema.properties) : []
+	}
 }
 
 jsonSchemaAvro._convertId = (id) => {
