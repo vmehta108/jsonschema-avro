@@ -3,14 +3,13 @@
 Parent Project: 
 [thedumbterminal/jsonschema-avro](https://github.com/thedumbterminal/jsonschema-avro)
 
-[![npm](https://img.shields.io/npm/v/jsonschema-avro.svg)](https://www.npmjs.com/package/jsonschema-avro)
-[![Build Status](https://travis-ci.org/thedumbterminal/jsonschema-avro.svg?branch=master)](https://travis-ci.org/thedumbterminal/jsonschema-avro)
+[![Build Status](https://travis-ci.org/dipsmishra/jsonschema-avro.svg?branch=master)](https://travis-ci.org/dipsmishra/jsonschema-avro)
 
 Converts JSON-schema definitions into Avro definitions.
 
 ## Install
 
-    npm install jsonschema-avro
+    npm install --save dipsmishra/jsonschema-avro#master
 
 ## Consume
 
