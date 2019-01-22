@@ -30,7 +30,12 @@ Converts JSON-schema definitions into Avro definitions.
     	}
     }
     
-    const avro = jsonSchemaAvro.convert(inJson)
+    jsonSchemaAvro.convert(inJson)
+        .then(avro => {
+            // use avro schema here
+        }).catch(err => {
+            // handle error here
+        });
 
 All external references are resolved using the excellent [json-schema-ref-parser](https://www.npmjs.com/package/json-schema-ref-parser).
 
