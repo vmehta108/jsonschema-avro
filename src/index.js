@@ -140,7 +140,7 @@ jsonSchemaAvro._convertCombinationOfProperty = (name, contents) => {
 													`${it.name}_record` : 
 													(jsonSchemaAvro._isOneOf(contents) || jsonSchemaAvro._isAllOf(contents) ? 
 														`${name}_record` :
-														`record_${index}`
+														`${index}_record`
 													),
 											doc: it.description || '',
 											fields: 

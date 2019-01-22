@@ -5,7 +5,7 @@
 	"type": [
 		{
 			"type": "record",
-			"name": "record_0",
+			"name": "FullAddress_record",
 			"doc": "the full address",
 			"fields": [
 				{
@@ -27,7 +27,7 @@
 		},
 		{
 			"type": "record",
-			"name": "record_1",
+			"name": "ShortAddress_record",
 			"doc": "the short address",
 			"fields": [
 				{
