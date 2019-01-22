@@ -1,0 +1,23 @@
+{
+  "doc": "Array or Null example",
+  "fields": [
+    {
+      "doc": "example array or null",
+      "name": "list",
+      "type": [
+        {
+          "items": {
+            "doc": "a string",
+            "name": "list",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "null"
+      ]
+    }
+  ],
+  "name": "main",
+  "namespace": "http.yourdomain.com.schemas.myschema.json",
+  "type": "record"
+}

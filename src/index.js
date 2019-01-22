@@ -217,10 +217,13 @@ jsonSchemaAvro._convertProperty = (name, value) => {
 		prop.default = value.default
 	}
 	if(Array.isArray(value.type)){
-		prop.type = value.type.map(type => typeMapping[type])
-		if(prop.type.indexOf('array') > -1) {
-			prop.items = jsonSchemaAvro._getItems(name, value)
-		}
+    prop.type = value.type.map(type => 
+        type === 'array' ? 
+        {
+          type: 'array',
+          items: jsonSchemaAvro._getItems(name, value)
+        }:
+        typeMapping[type]);
 	}
 	else{
 		prop.type = typeMapping[value.type]

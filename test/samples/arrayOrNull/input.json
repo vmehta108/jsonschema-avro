@@ -1,0 +1,18 @@
+{
+	"id": "http://yourdomain.com/schemas/myschema.json",
+	"description": "Array or Null example",
+	"type": "object",
+	"properties": {
+		"list": {
+			"description": "example array or null",
+      "type": [
+        "array",
+        "null"
+      ],
+			"items": {
+				"description": "a string",
+				"type": "string"
+			}
+		}
+	}
+}
