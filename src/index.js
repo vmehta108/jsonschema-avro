@@ -14,10 +14,16 @@ const typeMapping = {
 
 const reSymbol = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
-jsonSchemaAvro.convert = async (schema) => {
+jsonSchemaAvro.convert = async (schema, recordSuffix) => {
 	if(!schema){
 		throw new Error('No schema given')
-	}
+  }
+  
+  if (typeof recordSuffix === 'undefined' || recordSuffix === null) { 
+    recordSuffix = '_record';
+  }
+  jsonSchemaAvro._recordSuffix = recordSuffix;
+
 	const avroSchema = await $RefParser.dereference(schema)
 		  .then(function(jsonSchema) {
 		    return jsonSchemaAvro._mainRecord(jsonSchema)
@@ -137,10 +143,10 @@ jsonSchemaAvro._convertCombinationOfProperty = (name, contents) => {
 										{
 											type: 'record',
 											name: 	it.name ? 
-													`${it.name}_record` : 
+													`${it.name}${jsonSchemaAvro._recordSuffix}` : 
 													(jsonSchemaAvro._isOneOf(contents) || jsonSchemaAvro._isAllOf(contents) ? 
-														`${name}_record` :
-														`${index}_record`
+														`${name}${jsonSchemaAvro._recordSuffix}` :
+														`${index}${jsonSchemaAvro._recordSuffix}`
 													),
 											doc: it.description || '',
 											fields: 
@@ -162,7 +168,7 @@ jsonSchemaAvro._convertComplexProperty = (name, contents) => {
 		doc: contents.description || '',
 		type: {
 			type: 'record',
-			name: `${name}_record`,
+			name: `${name}${jsonSchemaAvro._recordSuffix}`,
 			fields: [].concat.apply([], jsonSchemaAvro._getCombinationOf(contents || {}).
 				map((it) => it.properties ? jsonSchemaAvro._convertProperties(it.properties) : [])
 			)
@@ -174,7 +180,7 @@ jsonSchemaAvro._getItems = (name, contents) => {
 	return jsonSchemaAvro._isComplex(contents.items)
 				? {
 					type: 'record',
-					name: `${name}_record`,
+					name: `${name}${jsonSchemaAvro._recordSuffix}`,
 					fields: jsonSchemaAvro._convertProperties(contents.items.properties || {})
 				}
 				: jsonSchemaAvro._convertProperty(name, contents.items)
