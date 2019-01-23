@@ -15,15 +15,16 @@ const typeMapping = {
 
 const reSymbol = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
-const _mapPropertiesToTypeName = (dereferencedAvroSchema) => {
-  if(!dereferencedAvroSchema) return {};
-  const new_obj = {};
-  for (let name in dereferencedAvroSchema) {
+jsonSchemaAvro._mapPropertiesToTypes = (dereferencedAvroSchema) => {
+  if(!dereferencedAvroSchema) return new Map();
+  const new_obj = new Map();
+  let name 
+  let prop
+  for (name in dereferencedAvroSchema) {
     if(dereferencedAvroSchema.hasOwnProperty(name) && dereferencedAvroSchema[name].hasOwnProperty('properties')) {
-      new_obj[dereferencedAvroSchema[name].properties] = {
-        "$ref": name,
-        ...dereferencedAvroSchema[name],
-      };
+		prop = dereferencedAvroSchema[name];
+		prop["$ref"] = name;
+		new_obj.set(dereferencedAvroSchema[name].properties, { ...prop });
     }
   }
   return new_obj
@@ -38,15 +39,15 @@ jsonSchemaAvro.convert = async (schema, recordSuffix) => {
     recordSuffix = '_record';
   }
 
-  jsonSchemaAvro._globalTypesCache = {};
-  jsonSchemaAvro._definitions = {};
+  jsonSchemaAvro._globalTypesCache = new Map();
+  jsonSchemaAvro._definitions = new Map();
   jsonSchemaAvro._recordSuffix = recordSuffix;
   jsonSchemaAvro._schema = schema;
 
 	const avroSchema = await $RefParser.dereference(schema)
 		  .then(function(jsonSchema) {
         jsonSchemaAvro._avroJsonSchema = jsonSchema;
-        jsonSchemaAvro._definitions = _mapPropertiesToTypeName(
+        jsonSchemaAvro._definitions = jsonSchemaAvro._mapPropertiesToTypes(
           $RefParser.$refs.values()[$RefParser.$refs.paths()].definitions
         );
 		    return jsonSchemaAvro._mainRecord(jsonSchema)
@@ -154,7 +155,7 @@ jsonSchemaAvro._collectCombinationProperties = (contents) => {
 }
 
 jsonSchemaAvro._getDereferencedType = (properties) => {
-  const typeDef = jsonSchemaAvro._definitions[properties];
+  const typeDef = jsonSchemaAvro._definitions.get(properties);
   if(!typeDef) return typeDef;
 
   const dereferencedType = {
@@ -180,11 +181,11 @@ jsonSchemaAvro._convertCombinationOfProperty = (name, contents) =>
           `${name}${jsonSchemaAvro._recordSuffix}`;
         if (it && it.type && it.type === 'null') {
           return 'null'
-        } else if (jsonSchemaAvro._globalTypesCache[it.properties]) {
-          return jsonSchemaAvro._globalTypesCache[it.properties];
+        } else if (jsonSchemaAvro._globalTypesCache.get(it.properties)) {
+          return jsonSchemaAvro._globalTypesCache.get(it.properties);
         } else {
           const dereferencedType = jsonSchemaAvro._getDereferencedType(it.properties);
-          jsonSchemaAvro._globalTypesCache[it.properties] = dereferencedType;
+          jsonSchemaAvro._globalTypesCache.set(it.properties, dereferencedType);
           return {
             type: 'record',
             name: dereferencedType ? dereferencedType.name : recordName,
@@ -200,16 +201,16 @@ jsonSchemaAvro._convertCombinationOfProperty = (name, contents) =>
 
 jsonSchemaAvro._convertComplexProperty = (name, contents) => {
   const recordName = `${name}${jsonSchemaAvro._recordSuffix}`;
-  if (jsonSchemaAvro._globalTypesCache[contents.properties]) {
+  if (jsonSchemaAvro._globalTypesCache.get(contents.properties)) {
     const complexProperty = {
       name: name,
       doc: contents.description || '',
-      type: jsonSchemaAvro._globalTypesCache[contents.properties].type
+      type: jsonSchemaAvro._globalTypesCache.get(contents.properties).type
     };
     return complexProperty;
   } else {
     const dereferencedType = jsonSchemaAvro._getDereferencedType(contents.properties);
-    jsonSchemaAvro._globalTypesCache[contents.properties] = dereferencedType;
+    jsonSchemaAvro._globalTypesCache.set(contents.properties, dereferencedType);
 
     const recordType = {
       type: 'record',
@@ -232,11 +233,11 @@ jsonSchemaAvro._convertComplexProperty = (name, contents) => {
 jsonSchemaAvro._getItems = (name, contents) => {
   const recordName = `${name}${jsonSchemaAvro._recordSuffix}`;
   if (jsonSchemaAvro._isComplex(contents.items)) {
-    if (jsonSchemaAvro._globalTypesCache[contents.items.properties]) {
-      return jsonSchemaAvro._globalTypesCache[recordName];
+    if (jsonSchemaAvro._globalTypesCache.get(contents.items.properties)) {
+      return jsonSchemaAvro._globalTypesCache.get(recordName);
     } else {
       const dereferencedType = jsonSchemaAvro._getDereferencedType(contents.items.properties);
-      jsonSchemaAvro._globalTypesCache[contents.items.properties] = dereferencedType;
+      jsonSchemaAvro._globalTypesCache.set(contents.items.properties, dereferencedType);
       return {
         type: 'record',
         name: dereferencedType ? dereferencedType.name : recordName,
