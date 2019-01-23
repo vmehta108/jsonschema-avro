@@ -19,7 +19,7 @@
       "type": "object",
       "properties": {
         "postcode":   { "type": "string", "description": "the postcode" },
-          "type": 		{ "enum": [ "residential", "business", "mixed_use" ], "description": "the address type" }
+        "type": 		  { "enum": [ "residential", "business", "mixed_use" ], "description": "the address type" }
     },
       "required": ["postcode", "type"]
     }

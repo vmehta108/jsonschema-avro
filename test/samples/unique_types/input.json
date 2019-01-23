@@ -1,0 +1,28 @@
+{
+  "id": "http://yourdomain.com/schemas/unique-types-schema.json",
+  "description": "unique types example",
+  "definitions": {
+  	"Address": {
+      "description": "the address type",
+      "type": "object",
+      "properties": {
+        "street":		{ "type": "string", "description": "the street" },
+        "city":     { "type": "string", "description": "the city" },
+        "state":    { "type": "string", "description": "the state" }
+      },
+      "required": ["street", "city", "state"]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "BillingAddress": {
+      "description": "the billing address",
+      "$ref": "#/definitions/Address"
+    },
+    "ShippingAddress": {
+      "description": "the shipping address",
+      "$ref": "#/definitions/Address"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+	"namespace": "http.yourdomain.com.schemas.unique.types.schema.json",
+	"name": "main",
+	"doc": "unique types example",
+  "type": "record",
+  "fields": [
+    {
+      "name": "BillingAddress",
+      "doc": "the billing address",
+      "type": {
+        "type": "record",
+        "name": "Address",
+        "doc": "the address type",
+        "fields": [
+          {
+            "name": "street",
+            "doc": "the street",
+            "type": "string"
+          },
+          {
+            "name": "city",
+            "doc": "the city",
+            "type": "string"
+          },
+          {
+            "name": "state",
+            "doc": "the state",
+            "type": "string"
+          }
+        ]
+      }
+    },
+		{
+			"type": "Address",
+			"name": "ShippingAddress",
+			"doc": "the shipping address"
+		}
+	]
+}
