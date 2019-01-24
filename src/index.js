@@ -41,7 +41,7 @@ jsonSchemaAvro._mapPropertiesToTypes = (dereferencedAvroSchema) => {
       } else if(jsonSchemaAvro._isCombinationOf(dereferencedAvroSchema[name])) {
         new_obj.set(jsonSchemaAvro._collectCombinationReferences(dereferencedAvroSchema[name]), prop);
       } else {
-        // array? enum? primitives? null? types? throw new Error(`Invalid or unhandled reference: ${prop}`);
+        // throw new Error(`Invalid or unhandled reference: ${JSON.stringify(prop)}`);
       }
     }
   }
@@ -68,6 +68,7 @@ jsonSchemaAvro.convert = async (schema, recordSuffix) => {
         jsonSchemaAvro._definitions = jsonSchemaAvro._mapPropertiesToTypes(
           $RefParser.$refs.values()[$RefParser.$refs.paths()].definitions
         );
+        // console.log(jsonSchemaAvro._definitions);
 		    return jsonSchemaAvro._mainRecord(jsonSchema)
 		  })
 		  .catch(function(err) {
@@ -172,24 +173,33 @@ jsonSchemaAvro._collectCombinationProperties = (contents) => {
 	)
 }
 
-jsonSchemaAvro._getDereferencedType = (properties) => {
-  const typeDef = jsonSchemaAvro._definitions.get(properties);
-  if(!typeDef) return typeDef;
+jsonSchemaAvro._getDereferencedType = (schema) => {
 
-  const dereferencedType = {
-    type: typeDef['$ref'],
-  };
-  if(typeDef.hasOwnProperty('name')) {
-    dereferencedType.name = typeDef.name;
+	if(!schema) return schema;
+	let typeDef;
+
+	if(schema.hasOwnProperty('properties')) {
+		typeDef = jsonSchemaAvro._definitions.get(schema.properties)
+	} else {
+		typeDef = schema;
+	}
+
+	if(!typeDef) return typeDef;
+
+	const dereferencedType = {
+		type: typeDef['$ref'],
+	};
+	if(typeDef.hasOwnProperty('name')) {
+		dereferencedType.name = typeDef.name;
+	}
+	if(typeDef.hasOwnProperty('description')) {
+		dereferencedType.doc = typeDef.description;
   }
-  if(typeDef.hasOwnProperty('description')) {
-    dereferencedType.doc = typeDef.description;
-  }
-  return dereferencedType;
+	return dereferencedType;
 }
 
-jsonSchemaAvro._convertCombinationOfProperty = (name, contents) =>
-   ({
+jsonSchemaAvro._convertCombinationOfProperty = (name, contents) => {
+   return ({
     name: name,
     doc: contents.description || '',
     type: !contents ? []: [].concat.apply([], jsonSchemaAvro._getCombinationOf(contents).
@@ -199,23 +209,24 @@ jsonSchemaAvro._convertCombinationOfProperty = (name, contents) =>
           `${name}${jsonSchemaAvro._recordSuffix}`;
         if (it && it.type && it.type === 'null') {
           return 'null'
-        } else if (jsonSchemaAvro._globalTypesCache.get(it.properties)) {
-          return jsonSchemaAvro._globalTypesCache.get(it.properties);
+        } else if (jsonSchemaAvro._globalTypesCache.get(it['$ref'])) {
+          return jsonSchemaAvro._globalTypesCache.get(it['$ref']);
         } else {
-          const dereferencedType = jsonSchemaAvro._getDereferencedType(it.properties);
-          jsonSchemaAvro._globalTypesCache.set(it.properties, dereferencedType);
-          return {
+          let dereferencedType = jsonSchemaAvro._getDereferencedType(it);
+          jsonSchemaAvro._globalTypesCache.set(it['$ref'], dereferencedType);
+          let complexProperty = {
             type: 'record',
-            name: dereferencedType ? dereferencedType.name : recordName,
+            name: dereferencedType ? dereferencedType.type : recordName,
             doc: dereferencedType ? dereferencedType.doc : it.description || '',
             fields: jsonSchemaAvro._isCombinationOf(it) ?
               jsonSchemaAvro._collectCombinationProperties(it) :
               (it.properties ? jsonSchemaAvro._convertProperties(it.properties) : [])
           };
+          return complexProperty;
         }
       }))
   });
-
+}
 
 jsonSchemaAvro._convertComplexProperty = (name, contents) => {
   const recordName = `${name}${jsonSchemaAvro._recordSuffix}`;
@@ -227,24 +238,24 @@ jsonSchemaAvro._convertComplexProperty = (name, contents) => {
     };
     return complexProperty;
   } else {
-    const dereferencedType = jsonSchemaAvro._getDereferencedType(contents.properties);
-    jsonSchemaAvro._globalTypesCache.set(contents.properties, dereferencedType);
-
+    const dereferencedType = jsonSchemaAvro._getDereferencedType(contents);
     const recordType = {
       type: 'record',
-      name: dereferencedType ? (dereferencedType.name || dereferencedType.type) : recordName,
+      name:  (dereferencedType && (dereferencedType.name || dereferencedType.type)) || recordName,
       fields: [].concat.apply([], jsonSchemaAvro._getCombinationOf(contents || {}).
         map((it) => it.properties ? jsonSchemaAvro._convertProperties(it.properties) : []))
     };
     if(dereferencedType && dereferencedType.doc) {
       recordType.doc = dereferencedType.doc;
     }
+    jsonSchemaAvro._globalTypesCache.set(contents.properties, dereferencedType);
     const complexProperty = {
       name: name,
       doc: contents.description || '',
       type: recordType
     };
-  return complexProperty
+
+    return complexProperty
   }
 }
 
@@ -254,11 +265,11 @@ jsonSchemaAvro._getItems = (name, contents) => {
     if (jsonSchemaAvro._globalTypesCache.get(contents.items.properties)) {
       return jsonSchemaAvro._globalTypesCache.get(recordName);
     } else {
-      const dereferencedType = jsonSchemaAvro._getDereferencedType(contents.items.properties);
+      const dereferencedType = jsonSchemaAvro._getDereferencedType(contents.items);
       jsonSchemaAvro._globalTypesCache.set(contents.items.properties, dereferencedType);
       return {
         type: 'record',
-        name: dereferencedType ? dereferencedType.name : recordName,
+        name: (dereferencedType && (dereferencedType.name || dereferencedType.type)) || recordName,
         doc: dereferencedType ? dereferencedType.doc : (contents.items.description || ''),
         fields: jsonSchemaAvro._convertProperties(contents.items.properties || {})
       }

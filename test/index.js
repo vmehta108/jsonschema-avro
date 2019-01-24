@@ -9,22 +9,22 @@ describe('index', () => {
 		const testDirs = fs.readdirSync(sampleDir)
 
 		testDirs.forEach(dir => {
+      // if(dir === 'unique_types') {
+        describe(dir, () => {
+          const inJson = require(`../${sampleDir}/${dir}/input.json`)
+          const expected = require(`../${sampleDir}/${dir}/expected.json`)
+          let result
 
-			describe(dir, () => {
-				const inJson = require(`../${sampleDir}/${dir}/input.json`)
-				const expected = require(`../${sampleDir}/${dir}/expected.json`)
-				let result
+          before(async () => {
+            result = await jsonSchemaAvro.convert(inJson)
+          })
 
-				before(async () => {
-					result = await jsonSchemaAvro.convert(inJson)
-				})
-
-				it('converts to avro', () => {
-					// if(dir === 'unique_types') console.log(JSON.stringify(result, null, 2))
-					// if(dir === 'unique_types') console.log(JSON.stringify(expected, null, 2))
-					assert.deepEqual(result, expected)
-				})
-			})
+          it('converts to avro', () => {
+            // console.log(JSON.stringify(result, null, 2))
+            // console.log(JSON.stringify(expected, null, 2))
+            assert.deepEqual(result, expected)
+          })
+        })
     })
 
     describe('other tests', () => {
