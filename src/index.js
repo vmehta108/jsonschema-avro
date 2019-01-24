@@ -15,16 +15,34 @@ const typeMapping = {
 
 const reSymbol = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
+jsonSchemaAvro._collectCombinationReferences = (contents) => {
+	return !contents ? [] : [].concat.apply([], 
+		jsonSchemaAvro._getCombinationOf(contents).map(
+			(it) => {
+				return jsonSchemaAvro._isCombinationOf(it) ?
+					jsonSchemaAvro._collectCombinationReferences(it) :
+					(it.properties ? it.properties : [])
+			}
+		)
+	)
+}
+
 jsonSchemaAvro._mapPropertiesToTypes = (dereferencedAvroSchema) => {
   if(!dereferencedAvroSchema) return new Map();
   const new_obj = new Map();
   let name 
   let prop
   for (name in dereferencedAvroSchema) {
-    if(dereferencedAvroSchema.hasOwnProperty(name) && dereferencedAvroSchema[name].hasOwnProperty('properties')) {
-		prop = dereferencedAvroSchema[name];
-		prop["$ref"] = name;
-		new_obj.set(dereferencedAvroSchema[name].properties, { ...prop });
+    if(dereferencedAvroSchema.hasOwnProperty(name)) {
+      prop = dereferencedAvroSchema[name];
+      prop["$ref"] = name;
+      if(dereferencedAvroSchema[name].hasOwnProperty('properties')) {
+        new_obj.set(dereferencedAvroSchema[name].properties, prop);
+      } else if(jsonSchemaAvro._isCombinationOf(dereferencedAvroSchema[name])) {
+        new_obj.set(jsonSchemaAvro._collectCombinationReferences(dereferencedAvroSchema[name]), prop);
+      } else {
+        // array? enum? primitives? null? types? throw new Error(`Invalid or unhandled reference: ${prop}`);
+      }
     }
   }
   return new_obj
