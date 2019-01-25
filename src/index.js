@@ -263,7 +263,7 @@ jsonSchemaAvro._getItems = (name, contents) => {
   const recordName = `${name}${jsonSchemaAvro._recordSuffix}`;
   if (jsonSchemaAvro._isComplex(contents.items)) {
     if (jsonSchemaAvro._globalTypesCache.get(contents.items.properties)) {
-      return jsonSchemaAvro._globalTypesCache.get(recordName);
+      return jsonSchemaAvro._globalTypesCache.get(contents.items.properties);
     } else {
       const dereferencedType = jsonSchemaAvro._getDereferencedType(contents.items);
       jsonSchemaAvro._globalTypesCache.set(contents.items.properties, dereferencedType);
