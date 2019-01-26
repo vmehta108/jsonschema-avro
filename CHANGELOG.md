@@ -3,7 +3,8 @@
 ## v2.0.0: Handle "enterprise-scale" schemas (26/01/2019)
 
 Major Update for handling complex "enterprise-scale" JSON schemas (dipsmishra)
-.convert() is now asynchronous and returns Promise #breaking-change
+
+**NOTE:** .convert() is now asynchronous and returns Promise **#breaking-change**
 
 * Removed 2 npm vulnerabilities (1 low, 1 critical) from mocha (upgraded mocha version)
 * Added support for combination schemas (anyOf, allOf, oneOf) including nested combinations
