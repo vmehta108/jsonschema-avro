@@ -59,6 +59,44 @@ describe('index', () => {
         //console.log(JSON.stringify(expected, null, 2))
         assert.deepEqual(result, expected)
       })
+
+      it('supports no id splitting for main record', async () => {
+        const inJson = require(`../${otherDir}/no-split-id-for-main-specified/input.json`)
+        const expected = require(`../${otherDir}/no-split-id-for-main-specified/expected.json`)
+        let result = await jsonSchemaAvro.convert(inJson, '', false)
+        //console.log(JSON.stringify(result, null, 2))
+        //console.log(JSON.stringify(expected, null, 2))
+        assert.deepEqual(result, expected)
+        result = await jsonSchemaAvro.convert(inJson, '', undefined)
+        assert.deepEqual(result, expected)
+        result = await jsonSchemaAvro.convert(inJson, '', null)
+        assert.deepEqual(result, expected)
+      })
+
+      it('supports id splitting for main record swtched off by default', async () => {
+        const inJson = require(`../${otherDir}/no-split-id-for-main/input.json`)
+        const expected = require(`../${otherDir}/no-split-id-for-main/expected.json`)
+        let result = await jsonSchemaAvro.convert(inJson)
+
+        //console.log(JSON.stringify(result, null, 2))
+        //console.log(JSON.stringify(expected, null, 2))
+        assert.deepEqual(result, expected)
+      })
+
+      it('supports id splitting for main record', async () => {
+        const inJson = require(`../${otherDir}/split-id-for-main/input.json`)
+        const expected = require(`../${otherDir}/split-id-for-main/expected.json`)
+        let result = await jsonSchemaAvro.convert(inJson, 'Record', true)
+
+        //console.log(JSON.stringify(result, null, 2))
+        //console.log(JSON.stringify(expected, null, 2))
+        assert.deepEqual(result, expected)
+        result = await jsonSchemaAvro.convert(inJson, 'Record', 'true')
+        assert.deepEqual(result, expected)
+        result = await jsonSchemaAvro.convert(inJson, 'Record', {})
+        assert.deepEqual(result, expected)
+      })
+
     })
 	})
 })

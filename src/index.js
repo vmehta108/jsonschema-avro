@@ -48,7 +48,7 @@ jsonSchemaAvro._mapPropertiesToTypes = (dereferencedAvroSchema) => {
   return new_obj
 };
 
-jsonSchemaAvro.convert = async (schema, recordSuffix) => {
+jsonSchemaAvro.convert = async (schema, recordSuffix, splitIdForMain) => {
 	if(!schema){
 		throw new Error('No schema given')
   }
@@ -57,6 +57,7 @@ jsonSchemaAvro.convert = async (schema, recordSuffix) => {
     recordSuffix = '_record';
   }
 
+  jsonSchemaAvro._splitIdForMain = splitIdForMain;
   jsonSchemaAvro._globalTypesCache = new Map();
   jsonSchemaAvro._definitions = new Map();
   jsonSchemaAvro._recordSuffix = recordSuffix;
@@ -78,14 +79,19 @@ jsonSchemaAvro.convert = async (schema, recordSuffix) => {
 }
 
 jsonSchemaAvro._mainRecord = (jsonSchema) => {
+  const schemaId = jsonSchemaAvro._convertId(jsonSchema.id);
+  const schemaIdParts = schemaId.split('.');
+  const schemaName = schemaIdParts.pop();
+  const ns = jsonSchemaAvro._splitIdForMain ? schemaIdParts.join('.') : schemaId;
+  const mainRecordName = jsonSchemaAvro._splitIdForMain ? schemaName : 'main';
 	return jsonSchemaAvro._isOneOf(jsonSchema) || jsonSchemaAvro._isAnyOf(jsonSchema) ? 
 		{
-			namespace: jsonSchemaAvro._convertId(jsonSchema.id),
-			...jsonSchemaAvro._convertCombinationOfProperty('main', jsonSchema)
-		}:
+			namespace: ns,
+			...jsonSchemaAvro._convertCombinationOfProperty(mainRecordName, jsonSchema)
+		} :
 		{
-			namespace: jsonSchemaAvro._convertId(jsonSchema.id),
-			name: 'main',
+			namespace: ns,
+			name: mainRecordName,
 			type: 'record',
 			doc: jsonSchema.description,
 			fields: [].concat.apply([], jsonSchemaAvro._getCombinationOf(jsonSchema).
