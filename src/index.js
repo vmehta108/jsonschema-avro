@@ -262,11 +262,12 @@ jsonSchemaAvro._convertComplexProperty = (name, contents) => {
 jsonSchemaAvro._getItems = (name, contents) => {
   const recordName = `${name}${jsonSchemaAvro._recordSuffix}`;
   if (jsonSchemaAvro._isComplex(contents.items)) {
-    if (jsonSchemaAvro._globalTypesCache.get(contents.items.properties)) {
-      return jsonSchemaAvro._globalTypesCache.get(contents.items.properties);
+    const key = contents.items['$ref'] || contents.items.properties;
+    if (jsonSchemaAvro._globalTypesCache.get(key)) {
+      return jsonSchemaAvro._globalTypesCache.get(key);
     } else {
       const dereferencedType = jsonSchemaAvro._getDereferencedType(contents.items);
-      jsonSchemaAvro._globalTypesCache.set(contents.items.properties, dereferencedType);
+      jsonSchemaAvro._globalTypesCache.set(key, dereferencedType);
       return {
         type: 'record',
         name: (dereferencedType && (dereferencedType.name || dereferencedType.type)) || recordName,
