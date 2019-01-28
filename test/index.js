@@ -91,9 +91,19 @@ describe('index', () => {
         //console.log(JSON.stringify(result, null, 2))
         //console.log(JSON.stringify(expected, null, 2))
         assert.deepEqual(result, expected)
-        result = await jsonSchemaAvro.convert(inJson, 'Record', 'true')
+        result = await jsonSchemaAvro.convert(inJson, 'Record', 1)
         assert.deepEqual(result, expected)
         result = await jsonSchemaAvro.convert(inJson, 'Record', {})
+        assert.deepEqual(result, expected)
+      })
+
+      it('supports id splitting for main record with specified suffix', async () => {
+        const inJson = require(`../${otherDir}/split-id-for-main-specified-suffix/input.json`)
+        const expected = require(`../${otherDir}/split-id-for-main-specified-suffix/expected.json`)
+        let result = await jsonSchemaAvro.convert(inJson, 'Record', 'Base')
+
+        //console.log(JSON.stringify(result, null, 2))
+        //console.log(JSON.stringify(expected, null, 2))
         assert.deepEqual(result, expected)
       })
 

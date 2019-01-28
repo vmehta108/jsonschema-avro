@@ -83,7 +83,11 @@ jsonSchemaAvro.convert = async (schema, recordSuffix, splitIdForMain) => {
 jsonSchemaAvro._mainRecord = (jsonSchema) => {
   const schemaId = jsonSchemaAvro._convertId(jsonSchema.id);
   const schemaIdParts = schemaId.split('.');
-  const schemaName = schemaIdParts.pop();
+  let schemaName = schemaIdParts.pop();
+  if(typeof jsonSchemaAvro._splitIdForMain === 'string') {
+    schemaIdParts.push(schemaName);
+    schemaName = schemaName + jsonSchemaAvro._splitIdForMain
+  }
   const ns = jsonSchemaAvro._splitIdForMain ? schemaIdParts.join('.') : schemaId;
   const mainRecordName = jsonSchemaAvro._splitIdForMain ? schemaName : 'main';
 	return jsonSchemaAvro._isOneOf(jsonSchema) || jsonSchemaAvro._isAnyOf(jsonSchema) ? 
