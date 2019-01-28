@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.0: Handle "additionalProperties" - simple maps (28/01/2019)
+
+Initial support for simple Avro "map"s (dipsmishra)
+
 ## v2.0.0: Handle "enterprise-scale" schemas (26/01/2019)
 
 Major Update for handling complex "enterprise-scale" JSON schemas (dipsmishra)

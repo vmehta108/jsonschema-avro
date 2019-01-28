@@ -1,0 +1,47 @@
+{
+  "id": "http://yourdomain.com/schemas/unique-types-schema.json",
+  "description": "unique types example",
+  "definitions": {
+    "Question": {
+      "type": "object",
+      "description": "the question type",
+      "additionalProperties": false,
+      "properties": {
+        "Conditions": {
+          "description": "the question condition",
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "Responses": {
+          "description": "the question responses",
+          "type": [
+            "null",
+            "object"
+          ],
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "KeyQuestionBank": {
+      "description": "the key question bank",
+      "$ref": "#/definitions/Question"
+    }
+  }
+}
