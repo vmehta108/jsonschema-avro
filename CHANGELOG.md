@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.1: Add option to provide name suffix for splitting IDs (28/01/2019)
+
+Adds option to provide a name suffix when name and namespace are derived from the "id" field (dipsmishra)
+
 ## v2.1.0: Handle "additionalProperties" - simple maps (28/01/2019)
 
 Initial support for simple Avro "map"s (dipsmishra)
