@@ -1,0 +1,49 @@
+{
+	"namespace": "http.yourdomain.com.schemas.unique.types.schema.json",
+	"name": "main",
+	"doc": "unique types example",
+  "type": "record",
+  "fields": [
+    {
+      "name": "KeyQuestionBank",
+      "doc": "the key question bank",
+      "type": {
+        "type": "record",
+        "name": "Question",
+        "doc": "the question type",
+        "fields": [
+          {
+            "name": "Conditions",
+            "doc": "the question condition",
+            "type":  [
+              {
+                "type": "array",
+                "items": 
+                  { 
+                    "type": "map", 
+                    "values": 
+                      { 
+                        "type": "array", 
+                        "items": "string"
+                      }
+                  }
+              },
+              "null"
+            ]
+          },
+          {
+            "name": "Responses",
+            "doc": "the question responses",
+            "type": [ 
+              "null", 
+              { 
+                "type": "map", 
+                "values": "string"
+              }
+            ] 
+          }
+        ]
+      }
+    }
+	]
+}
