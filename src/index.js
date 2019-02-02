@@ -351,7 +351,10 @@ jsonSchemaAvro._convertProperty = (name, value) => {
         type === 'object' && value.additionalProperties ?
         {
           type: 'map',
-          values: value.additionalProperties.type
+          values: value.additionalProperties.type !== 'array' &&
+                      value.additionalProperties.type !== 'object' ? 
+                    typeMapping[value.additionalProperties.type] :
+                    jsonSchemaAvro._convertProperty(undefined, value.additionalProperties)
         }
         : typeMapping[type];
       })

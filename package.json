@@ -1,6 +1,6 @@
 {
   "name": "jsonschema-avro",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Convert JSON-schema into avro schema including support for $ref and schema combinations (allOf, anyOf, oneOf)",
   "main": "src/index.js",
   "scripts": {

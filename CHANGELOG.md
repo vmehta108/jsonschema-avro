@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.2: Supports arrays nested within maps (02/02/2019)
+
+Supports arrays nested within maps (dipsmishra)
+
 ## v2.1.1: Add option to provide name suffix for splitting IDs (28/01/2019)
 
 Adds option to provide a name suffix when name and namespace are derived from the "id" field (dipsmishra)
