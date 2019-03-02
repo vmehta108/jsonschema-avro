@@ -1,0 +1,37 @@
+{
+  "id": "http://yourdomain.com/schemas/oneOfNullableEnum-schema.json",
+  "description": "oneOfNullableEnum example",
+  "definitions": {
+    "AddressType": {
+      "type": "string",
+      "description": "the address type",
+      "enum": [ "residential", "business", "mixed_use" ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "BillingAddress": {
+      "description": "the billing address",
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/definitions/AddressType"
+        }
+      ]
+    },
+    "ShippingAddress": {
+      "description": "the shipping address",
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/definitions/AddressType"
+        }
+      ]
+    }
+  }
+}

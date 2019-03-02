@@ -51,7 +51,7 @@ jsonSchemaAvro._mapPropertiesToTypes = (dereferencedAvroSchema) => {
   return new_obj
 };
 
-jsonSchemaAvro.convert = async (schema, recordSuffix, splitIdForMain) => {
+jsonSchemaAvro.convert = async (schema, recordSuffix, splitIdForMain, enumSuffix) => {
 	if(!schema){
 		throw new Error('No schema given')
   }
@@ -60,7 +60,12 @@ jsonSchemaAvro.convert = async (schema, recordSuffix, splitIdForMain) => {
     recordSuffix = '_record';
   }
 
+  if (typeof enumSuffix === 'undefined' || enumSuffix === null) { 
+    enumSuffix = '_enum';
+  }
+
   jsonSchemaAvro._splitIdForMain = splitIdForMain;
+  jsonSchemaAvro._enumSuffix = enumSuffix;
   jsonSchemaAvro._globalTypesCache = new Map();
   jsonSchemaAvro._definitions = new Map();
   jsonSchemaAvro._recordSuffix = recordSuffix;
@@ -227,7 +232,10 @@ jsonSchemaAvro._convertCombinationOfProperty = (name, contents) => {
         } else {
           let dereferencedType = jsonSchemaAvro._getDereferencedType(it);
           jsonSchemaAvro._globalTypesCache.set(it['$ref'], dereferencedType);
-          let complexProperty = {
+          let complexProperty = jsonSchemaAvro._hasEnum(it) ?
+          jsonSchemaAvro._convertEnumProperty(dereferencedType ? dereferencedType.type : recordName, it, 
+              dereferencedType ? dereferencedType.doc : it.description || ''):
+          {
             type: 'record',
             name: dereferencedType ? dereferencedType.type : recordName,
             doc: dereferencedType ? dereferencedType.doc : it.description || '',
@@ -315,21 +323,33 @@ jsonSchemaAvro._convertArrayProperty = (name, contents) => {
 	}
 }
 
-jsonSchemaAvro._convertEnumProperty = (name, contents) => {
-	const valid = contents.enum.every((symbol) => reSymbol.test(symbol))
-	let prop = {
-		name: name,
-		doc: contents.description || '',
-		type: valid ? {
-			type: 'enum',
-			name: `${name}_enum`,
-			symbols: contents.enum
-		} : 'string'
-	}
+jsonSchemaAvro._convertEnumProperty = (name, contents, doc) => {
+  const valid = contents.enum.every((symbol) => reSymbol.test(symbol))
+  const enumProp = {
+    name: name,
+    doc: doc || contents.description || '',
+  };
+  
+  if(contents.hasOwnProperty('$ref')) {
+    if(valid) {
+      enumProp.type = 'enum';
+      enumProp.symbols = contents.enum;
+    } else {
+      enumProp.type = 'string';
+    }
+  } else {
+    if(valid) {
+      enumProp.type = valid ? {
+        type: 'enum',
+        name: `${name}${jsonSchemaAvro._enumSuffix}`,
+        symbols: contents.enum
+      } : 'string';
+    }
+  }
 	if(contents.hasOwnProperty('default')){
-		prop.default = contents.default
+		enumProp.default = contents.default
 	}
-	return prop
+	return enumProp
 }
 
 jsonSchemaAvro._convertProperty = (name, value) => {

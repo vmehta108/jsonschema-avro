@@ -44,6 +44,8 @@ Converts JSON-schema definitions into Avro definitions.
   - recordSuffix: (optional) Suffix to be appended to the name of each record type (default: '_record')
   - splitIdForName: (optional) Split id in schema to obtain namespace and name (default: false)
       Note: a custom suffix may be provided to the name by specifying it as a string value for this option
+  - enumSuffix: (optional) Suffix for enum types (default: '_enum')
+      Note: a custom suffix may be provided to all enums by specifying it as a string value for this option
 
 All external references are resolved using the excellent [json-schema-ref-parser](https://www.npmjs.com/package/json-schema-ref-parser).
 

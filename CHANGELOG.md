@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.3: Supports nullable enums (02/03/2019)
+
+Supports enums within anyOf/oneOf/allOf; also, supports nullable enums (tested) (dipsmishra)
+
 ## v2.1.2: Supports arrays nested within maps (02/02/2019)
 
 Supports arrays nested within maps (dipsmishra)

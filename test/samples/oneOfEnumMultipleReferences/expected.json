@@ -1,0 +1,36 @@
+{
+  "namespace": "http.yourdomain.com.schemas.oneOfNullableEnum.schema.json",
+  "name": "main",
+  "type": "record",
+  "doc": "oneOfNullableEnum example",
+  "fields": [
+    {
+      "name": "BillingAddress",
+      "doc": "the billing address",
+      "type": [
+        "null",
+        {
+          "name": "AddressType",
+          "doc": "the address type",
+          "type": "enum",
+          "symbols": [
+            "residential",
+            "business",
+            "mixed_use"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ShippingAddress",
+      "doc": "the shipping address",
+      "type": [
+        "null",
+        {
+          "doc": "the address type",
+          "type": "AddressType"
+        }
+      ]
+    }
+  ]
+}
