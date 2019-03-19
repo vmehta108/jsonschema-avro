@@ -8,7 +8,7 @@
 			"doc": "the age",
 			"name": "age",
 			"type": [
-				"float",
+				"decimal",
 				"int",
 				"null"
 			]
