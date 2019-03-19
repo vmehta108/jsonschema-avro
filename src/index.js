@@ -10,7 +10,7 @@ const typeMapping = {
 	'null': 'null',
 	'boolean': 'boolean',
 	'integer': 'int',
-	'number': 'float'
+	'number': 'decimal'
 }
 
 const reSymbol = /^[A-Za-z_][A-Za-z0-9_]*$/;
